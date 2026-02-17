@@ -1,1 +1,1 @@
-# demo_rag
+# mathMind
