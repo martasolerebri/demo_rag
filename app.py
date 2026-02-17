@@ -8,7 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-st.set_page_config(page_title="Goodreads AI Librarian", layout="wide")
+st.set_page_config(page_title="Goodreads AI Librarian", page_icon="📖", layout="wide")
 
 def local_css(file_name):
     with open(file_name) as f:
