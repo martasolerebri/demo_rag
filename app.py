@@ -11,8 +11,11 @@ from langchain_core.runnables import RunnablePassthrough
 st.set_page_config(page_title="Goodreads AI Librarian", page_icon="📖", layout="wide")
 
 def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open(file_name) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        pass
 
 local_css("style.css")
 
@@ -24,6 +27,13 @@ with st.sidebar:
     hf_api_key = st.text_input("Hugging Face API Key", type="password")
     st.markdown("Get your keys at [Groq](https://groq.com/) and [HuggingFace](https://huggingface.co/).")
     
+    st.divider()
+    
+    # --- AQUÍ ESTÁ EL BOTÓN DE LIMPIAR HISTORIAL ---
+    if st.button("Clear History", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+        
     st.divider()
     
     st.header("Upload Library")
