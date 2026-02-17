@@ -57,25 +57,22 @@ with st.sidebar:
 # --- PANTALLA DE INICIO (Reemplaza al warning feo) ---
 if not groq_api_key or not hf_api_key or not uploaded_file:
     st.markdown("""
-    ### Welcome to your Personal AI Librarian! 📚
-    
     This application transforms your Goodreads export into an interactive, smart assistant. Instead of scrolling through hundreds of entries, you can simply chat with your library!
     
     **What it can do:**
-    * 🎯 **Find your next read:** Ask for recommendations from your *to-read* pile based on a specific genre, mood, or topic.
-    * 🧠 **Recall your thoughts:** Ask what you thought about a specific book or how you rated it.
-    * 📊 **Explore your habits:** Discover trends in the books you've read and shelved.
+    * **Find your next read:** Ask for recommendations from your *to-read* pile based on a specific genre, mood, or topic.
+    * **Recall your thoughts:** Ask what you thought about a specific book or how you rated it.
+    * **Explore your habits:** Discover trends in the books you've read and shelved.
 
     **To get started:**
     1. Enter your **API Keys** in the sidebar.
     2. **Upload** your Goodreads CSV file.
     """)
-    
-    # Indicadores visuales suaves de lo que falta
+
     if not groq_api_key or not hf_api_key:
-        st.info("🔑 Waiting for API Keys...")
+        st.info("Waiting for API Keys...")
     elif not uploaded_file:
-        st.info("📂 Waiting for Goodreads CSV upload...")
+        st.info("Waiting for Goodreads CSV upload...")
         
     st.stop()
 # ---------------------------------------------------
