@@ -163,7 +163,7 @@ for msg in st.session_state.messages:
 
 if prompt := st.chat_input("Ask about your books..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
+    st.chat_message("user", avatar="👤").write(prompt)
 
     system_prompt = (
         "You are a friendly, knowledgeable AI librarian analyzing a user's Goodreads library. "
@@ -187,7 +187,7 @@ if prompt := st.chat_input("Ask about your books..."):
         | StrOutputParser()
     )
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🤖"):
         with st.spinner("Scanning the shelves..."):
             response = chain.invoke(prompt)
             clean_response = response.split("</think>")[-1].strip() if "</think>" in response else response
