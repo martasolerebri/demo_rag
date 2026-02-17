@@ -54,7 +54,6 @@ with st.sidebar:
     id_model = "llama-3.3-70b-versatile"
     temperature = 0.5
 
-# --- PANTALLA DE INICIO (Reemplaza al warning feo) ---
 if not groq_api_key or not hf_api_key or not uploaded_file:
     st.markdown("""
     This application transforms your Goodreads export into an interactive, smart assistant. Instead of scrolling through hundreds of entries, you can simply chat with your library!
@@ -68,14 +67,8 @@ if not groq_api_key or not hf_api_key or not uploaded_file:
     1. Enter your **API Keys** in the sidebar.
     2. **Upload** your Goodreads CSV file.
     """)
-
-    if not groq_api_key or not hf_api_key:
-        st.info("Waiting for API Keys...")
-    elif not uploaded_file:
-        st.info("Waiting for Goodreads CSV upload...")
         
     st.stop()
-# ---------------------------------------------------
 
 @st.cache_resource
 def load_models(groq_key, hf_key):
