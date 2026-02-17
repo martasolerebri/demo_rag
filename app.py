@@ -29,7 +29,6 @@ with st.sidebar:
     
     st.divider()
     
-    # --- AQUÍ ESTÁ EL BOTÓN DE LIMPIAR HISTORIAL ---
     if st.button("Clear History", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
@@ -55,9 +54,31 @@ with st.sidebar:
     id_model = "llama-3.3-70b-versatile"
     temperature = 0.5
 
-if not groq_api_key or not hf_api_key:
-    st.warning("Please enter both API Keys in the sidebar to begin")
+# --- PANTALLA DE INICIO (Reemplaza al warning feo) ---
+if not groq_api_key or not hf_api_key or not uploaded_file:
+    st.markdown("""
+    ### Welcome to your Personal AI Librarian! 📚
+    
+    This application transforms your Goodreads export into an interactive, smart assistant. Instead of scrolling through hundreds of entries, you can simply chat with your library!
+    
+    **What it can do:**
+    * 🎯 **Find your next read:** Ask for recommendations from your *to-read* pile based on a specific genre, mood, or topic.
+    * 🧠 **Recall your thoughts:** Ask what you thought about a specific book or how you rated it.
+    * 📊 **Explore your habits:** Discover trends in the books you've read and shelved.
+
+    **To get started:**
+    1. Enter your **API Keys** in the sidebar.
+    2. **Upload** your Goodreads CSV file.
+    """)
+    
+    # Indicadores visuales suaves de lo que falta
+    if not groq_api_key or not hf_api_key:
+        st.info("🔑 Waiting for API Keys...")
+    elif not uploaded_file:
+        st.info("📂 Waiting for Goodreads CSV upload...")
+        
     st.stop()
+# ---------------------------------------------------
 
 @st.cache_resource
 def load_models(groq_key, hf_key):
@@ -126,64 +147,60 @@ def process_csv_to_retriever(books, embeddings_model):
     vectorstore = FAISS.from_documents(documents, embedding=embeddings_model)
     return vectorstore.as_retriever(search_kwargs={"k": 10})
 
-if uploaded_file:
-    if 'books' not in st.session_state or 'df' not in st.session_state:
-        books, df = parse_goodreads_csv(uploaded_file)
-        if books is None:
-            st.stop()
-        
-        st.session_state.books = books
-        st.session_state.df = df
+if 'books' not in st.session_state or 'df' not in st.session_state:
+    books, df = parse_goodreads_csv(uploaded_file)
+    if books is None:
+        st.stop()
     
-    books = st.session_state.books
-    df = st.session_state.df
+    st.session_state.books = books
+    st.session_state.df = df
+
+books = st.session_state.books
+df = st.session_state.df
+
+if 'retriever' not in st.session_state:
+    with st.spinner("Processing library for chat..."):
+        st.session_state.retriever = process_csv_to_retriever(books, embeddings)
+
+st.markdown("### Chat with your personal Librarian")
+st.markdown("*Ask questions like: 'Recommend me something from my to-read list'*")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+if prompt := st.chat_input("Ask about your books..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+
+    system_prompt = (
+        "You are a friendly, knowledgeable AI librarian analyzing a user's Goodreads library. "
+        "Use the following retrieved context (which contains books the user has shelved, their ratings, and their reviews) "
+        "to answer their question or provide recommendations. "
+        "If they ask for recommendations, prioritize books from their own library context. "
+        "Keep your responses conversational, insightful, and concise. "
+        "If you don't know the answer, just say so.\n\n"
+        "Context: {context}"
+    )
     
-    if 'retriever' not in st.session_state:
-        with st.spinner("Processing library for chat..."):
-            st.session_state.retriever = process_csv_to_retriever(books, embeddings)
-    
-    st.markdown("### Chat with your personal Librarian")
-    st.markdown("*Ask questions like: 'Recommend me something from my to-read list'*")
-    
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    qa_prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        ("human", "{input}"),
+    ])
 
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
+    chain = (
+        {"context": st.session_state.retriever, "input": RunnablePassthrough()}
+        | qa_prompt
+        | llm
+        | StrOutputParser()
+    )
 
-    if prompt := st.chat_input("Ask about your books..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.chat_message("user").write(prompt)
-
-        system_prompt = (
-            "You are a friendly, knowledgeable AI librarian analyzing a user's Goodreads library. "
-            "Use the following retrieved context (which contains books the user has shelved, their ratings, and their reviews) "
-            "to answer their question or provide recommendations. "
-            "If they ask for recommendations, prioritize books from their own library context. "
-            "Keep your responses conversational, insightful, and concise. "
-            "If you don't know the answer, just say so.\n\n"
-            "Context: {context}"
-        )
-        
-        qa_prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("human", "{input}"),
-        ])
-
-        chain = (
-            {"context": st.session_state.retriever, "input": RunnablePassthrough()}
-            | qa_prompt
-            | llm
-            | StrOutputParser()
-        )
-
-        with st.chat_message("assistant"):
-            with st.spinner("Scanning the shelves..."):
-                response = chain.invoke(prompt)
-                clean_response = response.split("</think>")[-1].strip() if "</think>" in response else response
-                
-                st.write(clean_response)
-                st.session_state.messages.append({"role": "assistant", "content": clean_response})
-
-else:
-    st.info("Upload your Goodreads library CSV from the sidebar to get started")
+    with st.chat_message("assistant"):
+        with st.spinner("Scanning the shelves..."):
+            response = chain.invoke(prompt)
+            clean_response = response.split("</think>")[-1].strip() if "</think>" in response else response
+            
+            st.write(clean_response)
+            st.session_state.messages.append({"role": "assistant", "content": clean_response})
