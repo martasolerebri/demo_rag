@@ -22,6 +22,7 @@ with st.sidebar:
     st.header("Configuration")
     groq_api_key = st.text_input("Groq API Key", type="password")
     hf_api_key = st.text_input("Hugging Face API Key", type="password")
+    st.markdown("Get your keys at [Groq](https://groq.com/) and [HuggingFace](https://huggingface.co/).")
     
     st.divider()
     
