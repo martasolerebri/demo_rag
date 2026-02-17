@@ -8,7 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-st.set_page_config(page_title="Goodreads AI Librarian", page_icon="📖", layout="wide")
+st.set_page_config(page_title="AI Goodreads Librarian", page_icon="📖", layout="wide")
 
 def local_css(file_name):
     try:
@@ -19,7 +19,7 @@ def local_css(file_name):
 
 local_css("style.css")
 
-st.title("Goodreads AI Librarian")
+st.title("AI Goodreads Librarian")
 
 with st.sidebar:
     st.header("Configuration")
