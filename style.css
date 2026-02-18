@@ -200,7 +200,7 @@ h1, h2, h3 {
 }
 
 [data-testid="stChatMessage"] {
-    background-color: #262730; 
+    background-color: transparent; 
     border-radius: 10px;
     margin-bottom: 10px;
     padding: 15px;
