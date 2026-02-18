@@ -204,11 +204,11 @@ h1, h2, h3 {
 }
 
 [data-testid="stChatMessage"]:has([data-testid="stChatUserMessage"]) {
-    background-color: #1e1e1e; 
+    background-color: transparent; 
     border-radius: 10px;
 }
 
 [data-testid="stChatMessage"]:has([data-testid="stChatAssistantMessage"]) {
-    background-color: #1e1e1e; 
+    background-color: transparent; 
     border-radius: 10px;
 }
