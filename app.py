@@ -38,9 +38,6 @@ with st.sidebar:
     st.header("Upload Library")
     uploaded_file = st.file_uploader("Upload Goodreads CSV", type="csv")
     
-    if uploaded_file:
-        st.success("Library loaded")
-    
     st.divider()
     st.markdown("""
     **How to export:**
