@@ -202,3 +202,13 @@ h1, h2, h3 {
 [data-testid="stChatMessage"] {
     animation: slideIn 0.3s ease-out !important;
 }
+
+[data-testid="stChatMessage"]:has([data-testid="stChatUserMessage"]) {
+    background-color: #1e1e1e; 
+    border-radius: 10px;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatAssistantMessage"]) {
+    background-color: #1e1e1e; 
+    border-radius: 10px;
+}
